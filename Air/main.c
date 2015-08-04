@@ -7,6 +7,10 @@
 
 #define F_CPU 16000000L
 
+#include <avr/io.h>
+#include <string.h>
+#include <util/delay.h>
+#include <avr/interrupt.h>
 #include "timers.h"
 #include "serial.h"
 #include "adc.h"
@@ -16,18 +20,11 @@
 #define RUDDER_ADJ 0
 #define NOSE_WHEEL_ADJ -27
 
-#include <avr/io.h>
-#include <string.h>
-#include <util/delay.h>
-#include <avr/interrupt.h>
-
 uint8_t allowThrust = 0;
 uint8_t flapsUp = 0;
 uint8_t flapsDown = 0;
-
 uint16_t counter1 = 0;
 uint16_t counter2 = 0;
-
 uint8_t aileronOffset = 0;
 int16_t elevatorOffset = 0;
 
@@ -36,7 +33,6 @@ void updateButtons(void);
 
 int main(void)
 {
-    DDRB |= 0b00111111;
     DDRD |= 0b11100000;
     PORTD |= 0b00100000;
 
@@ -45,8 +41,6 @@ int main(void)
     setupADC();
 
     sei();
-
-    //_delay_ms(1000);
 
     while (1)
     {
@@ -85,7 +79,7 @@ void updateButtons(void)
         channelPWM[5] = 1000;
     }
 
-    // Set the position of the flaperons with buttons 5 (down) and 6 (up)
+    // Set the position of the flaperons with joystick buttons 5 (down) and 6 (up)
     if (rxBuffer [8] == 1 && flapsDown == 0)
     {
         aileronOffset += (aileronOffset < 39) ? 13 : 0;
@@ -98,7 +92,7 @@ void updateButtons(void)
     flapsDown = rxBuffer[8];
     flapsUp = rxBuffer[9];
 
-    // Set the elevator trim with buttons 3 (up) and 4 (down)
+    // Set the elevator trim with joystick buttons 3 (up) and 4 (down)
     if (rxBuffer [6] == 1)
     {
         elevatorOffset += (elevatorOffset < 400) ? 1 : 0;
@@ -108,13 +102,14 @@ void updateButtons(void)
         elevatorOffset -= (elevatorOffset > -400) ? 1 : 0;
     }
 
-    // Reset the elevator trim if button 2 is pressed
+    // Reset the elevator trim if joystick button 2 is pressed
     if (rxBuffer [5] == 1)
     {
         elevatorOffset = 0;
     }
 }
 
+// This function is called 500 times per second
 void doAt500Hz(void)
 {
     updateAxes();

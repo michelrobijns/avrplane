@@ -17,6 +17,9 @@ volatile uint8_t *channelBanks[10] = {&PORTB, &PORTB, &PORTB, &PORTB, &PORTB, &P
 
 void setupTimers(void)
 {
+    // Set pin 8 to 13 to output
+    DDRB |= 0b00111111;
+
     // 8-bit Timer/Counter0
     
     // Enable Clear Timer on Compare Match (CTC) mode
@@ -50,6 +53,7 @@ void setupTimers(void)
 // This Interrupt Service Routine (ISR) is triggered exactly 500 times per second
 ISR(TIMER0_COMPA_vect)
 {
+    // Call doAt500Hz() defined in main.c
     doAt500Hz();
 
     // Set the counter value to 0
