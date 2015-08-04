@@ -1,5 +1,5 @@
 #
-# Makefile
+# Makefile for compiling C projects
 #
 # Created: 07/22/2015
 # Author: Michel Robijns

@@ -1,11 +1,13 @@
 #
-# Makefile for programming ATmega328P microcontrollers
+# Makefile for compiling ATmega328P projects and programming the microcontroller
 #
 # Created: 6/4/2015
 # Author: Michel Robijns
 #
 
 target = main
+dependencies =
+objects =
 
 microcontroller = 328p
 programmerType = arduino
@@ -13,6 +15,7 @@ programmerPort = /dev/ttyACM0
 
 cc = /usr/bin/avr-gcc
 cFlags = -g -mmcu=atmega$(microcontroller) -Wall -Os -Werror -Wextra -std=gnu99
+
 objectToHex = /usr/bin/avr-objcopy
 programmer = /usr/bin/avrdude
 
