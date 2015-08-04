@@ -36,8 +36,6 @@ uint8_t button4;
 uint8_t button5;
 uint8_t button6;
 
-char answer[15];
-
 struct joystick joystick;
 struct serialPort serialPort;
 
