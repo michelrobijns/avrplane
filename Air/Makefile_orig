@@ -1,13 +1,13 @@
 #
 # Makefile for compiling ATmega328P projects and programming the microcontroller
 #
-# Created: 4/6/2015
+# Created: 6/4/2015
 # Author: Michel Robijns
 #
 
 target = main
-dependencies = timers.h serial.h adc.h
-objects = main.o timers.o serial.o adc.o
+dependencies =
+objects = main.o
 
 microcontroller = 328p
 programmerType = arduino
@@ -21,13 +21,13 @@ programmer = /usr/bin/avrdude
 
 all: flash
 
-%.o: %.c $(dependencies)
-	$(cc) $(cFlags) -c -o $@ $<
+object:
+	$(cc) $(cFlags) -c -o $(target).o $(target).c
 
-$(target): $(objects)
-	$(cc) $(cFlags) -o $(target).elf $^
+elf: object
+	$(cc) $(cFlags) -o $(target).elf $(target).o
 
-hex: $(target)
+hex: elf
 	$(objectToHex) -j .text -j .data -O ihex $(target).elf $(target).hex
 
 flash: hex

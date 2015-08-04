@@ -1,7 +1,7 @@
 #
 # Makefile for compiling C projects
 #
-# Created: 07/22/2015
+# Created: 7/22/2015
 # Author: Michel Robijns
 #
 
@@ -12,7 +12,7 @@ objects = main.o joystick.o serial.o
 cc = /usr/bin/gcc
 cFlags = -I -g -Wall -Os -Wextra -std=gnu99 -pthread -lrt
 
-all: clean $(target)
+all: $(target)
 
 %.o: %.c $(dependencies)
 	$(cc) $(cFlags) -c -o $@ $<
