@@ -1,0 +1,20 @@
+#
+# Makefile
+#
+# Created: 07/22/2015
+# Author: Michel Robijns
+#
+
+target = main
+
+cc = /usr/bin/gcc
+cFlags = -I -g -Wall -Os -Wextra -std=gnu99 -pthread -lrt
+
+all: clean $(target)
+
+$(target):
+	$(cc) $(cFlags) $@.c -o $@
+
+clean:
+	rm -f $(target)
+
