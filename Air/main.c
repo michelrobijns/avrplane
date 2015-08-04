@@ -55,8 +55,6 @@ void setupADC(void);
 void updateAxes(void);
 void updateButtons(void);
 void updateADCs(void);
-//void appendSerial(char c);
-//void serialWrite(char c[]);
 void sendtxBuffer(void);
 void startConversion(void);
 
@@ -306,30 +304,6 @@ ISR(USART_TX_vect)
          txReadPos = 0;
      }
 }
-
-/*void serialWrite(char c[])
-{
-    for (uint8_t i = 0; i < strlen(c); i++)
-    {
-        appendSerial(c[i]);
-    }
-
-    if (UCSR0A & (1 << UDRE0))
-    {
-        UDR0 = 0;
-    }
-}
-
-void appendSerial(char c)
-{
-    txBuffer[txWritePos] = c;
-    txWritePos++;
-
-    if (txWritePos >= TX_BUFFER_SIZE)
-    {
-        txWritePos = 0;
-    }
-}*/
 
 void sendtxBuffer()
 {
