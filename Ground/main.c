@@ -73,7 +73,7 @@ void *joystickUpdater(__attribute__ ((unused)) void *argument)
 	{
 		updateJoystick(&joystick);
 		
-		roll = mapToRange(joystick.axis[0]);
+		roll = mapToRange(-1 * joystick.axis[0]);
 		pitch = mapToRange(-1 * joystick.axis[1]);
 		yaw = mapToRange(joystick.axis[2]);
 		throttle = mapToRange(-1 * joystick.axis[3]);

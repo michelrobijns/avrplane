@@ -33,9 +33,6 @@ void updateButtons(void);
 
 int main(void)
 {
-    DDRD |= 0b11100000;
-    PORTD |= 0b00100000;
-    
     setupSerial();
     setupTimers();
     setupADC();
@@ -54,8 +51,8 @@ int main(void)
 // Process input from the joystick axes
 void updateAxes(void)
 {
-    pwm[0] = 1000 + 10 * ((int) rxBuffer[0] + AILRN_ADJ - aileronOffset);
-    pwm[1] = 1000 + 10 * ((int) rxBuffer[0] + AILRN_ADJ + aileronOffset);
+    pwm[0] = 1000 + 10 * ((int) rxBuffer[0] + AILRN_ADJ + aileronOffset);
+    pwm[1] = 1000 + 10 * ((int) rxBuffer[0] + AILRN_ADJ - aileronOffset);
     pwm[2] = 1000 + 10 * ((int) rxBuffer[1] + ELVTR_ADJ - elevatorOffset / 10);
     pwm[3] = 1000 + 10 * ((int) rxBuffer[2] + RUDDR_ADJ);
     pwm[4] = 1300 + 4 * (100 - (int) rxBuffer[2] + N_WHL_ADJ);
