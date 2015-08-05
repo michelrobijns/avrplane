@@ -26,3 +26,6 @@ Ground/main
 
 # Debug files
 *.dSYM/
+
+# Mac OS system files
+*.DS_Store
