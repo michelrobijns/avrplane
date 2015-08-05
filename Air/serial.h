@@ -8,13 +8,10 @@
 #ifndef SERIAL_H_INCLUDED
 #define SERIAL_H_INCLUDED
 
-#define RX_BUFFER_SIZE 15
-#define TX_BUFFER_SIZE 15
-
-extern char rxBuffer[RX_BUFFER_SIZE];
-extern char txBuffer[TX_BUFFER_SIZE];
+extern char rxBuffer[15];
+extern char txBuffer[15];
 
 void setupSerial(void);
-void sendtxBuffer(void);
+void sendTxBuffer(void);
 
 #endif

@@ -15,4 +15,3 @@ void startConversion(void);
 void updateADCs(void);
 
 #endif
-

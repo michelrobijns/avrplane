@@ -10,10 +10,9 @@
 
 #include <avr/io.h>
 
-extern uint16_t channelPWM[10];
+extern uint16_t pwm[10];
 
 void setupTimers(void);
 extern void doAt500Hz(void);
 
 #endif
-

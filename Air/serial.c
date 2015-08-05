@@ -5,8 +5,8 @@
  * Author: Michel Robijns
  */
 
-#define F_CPU 16000000L
-#define BAUD 19200
+#define F_CPU 16000000UL
+#define BAUD 19200UL
 #define BRC ((F_CPU / 16 / BAUD) - 1)
 
 #include <avr/io.h>
@@ -14,8 +14,8 @@
 #include <avr/interrupt.h>
 #include "serial.h"
 
-char rxBuffer[RX_BUFFER_SIZE] = {50, 50, 50, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'e'};
-char txBuffer[TX_BUFFER_SIZE] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, '\0'};
+char rxBuffer[15] = {50, 50, 50, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'e'};
+char txBuffer[15] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, '\0'};
 
 uint8_t rxWritePos = 0;
 uint8_t txReadPos = 0;
@@ -35,7 +35,8 @@ void setupSerial(void)
     UCSR0B |= (1 << RXCIE0);
     UCSR0B |= (1 << TXCIE0);
     
-    // Set the Character Size to 8 bits. There is one stop bit, which the default setting.
+    // Set the Character Size to 8 bits. There is one stop bit, which is
+    // the default setting.
     UCSR0C |= (1 << UCSZ01) | (1 << UCSZ00);
 }
 
@@ -44,7 +45,7 @@ ISR(USART_RX_vect)
 {
     rxBuffer[rxWritePos] = UDR0; 
     rxWritePos++;
-
+    
     if ((rxWritePos >= RX_BUFFER_SIZE) || (rxBuffer[rxWritePos - 1] == 'e'))
     {
         rxWritePos = 0;
@@ -54,26 +55,26 @@ ISR(USART_RX_vect)
 // TX Complete Interrupt
 ISR(USART_TX_vect)
 {
-     if (txReadPos != txWritePos)
-     {
-         UDR0 = txBuffer[txReadPos];
-         txReadPos++;
-
-         if (txReadPos > TX_BUFFER_SIZE)
-         {
-             txReadPos = 0;
-         }
-     } else {
-         txReadPos = 0;
-     }
+    if (txReadPos != txWritePos)
+    {
+        UDR0 = txBuffer[txReadPos];
+        txReadPos++;
+        
+        if (txReadPos > TX_BUFFER_SIZE)
+        {
+            txReadPos = 0;
+        }
+    } else {
+        txReadPos = 0;
+    }
 }
 
-void sendtxBuffer(void)
+void sendTxBuffer(void)
 {
     if (UCSR0A & (1 << UDRE0))
     {
         UDR0 = txBuffer[0];
-
+        
         txWritePos = 15;
         txReadPos = 1;
     }

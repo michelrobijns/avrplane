@@ -35,4 +35,3 @@ flash: hex
 
 clean:
 	rm -f *.elf *.hex *.obj *.o
-
