@@ -46,7 +46,7 @@ ISR(USART_RX_vect)
     rxBuffer[rxWritePos] = UDR0; 
     rxWritePos++;
     
-    if ((rxWritePos >= RX_BUFFER_SIZE) || (rxBuffer[rxWritePos - 1] == 'e'))
+    if ((rxWritePos >= 15) || (rxBuffer[rxWritePos - 1] == 'e'))
     {
         rxWritePos = 0;
     }
@@ -60,7 +60,7 @@ ISR(USART_TX_vect)
         UDR0 = txBuffer[txReadPos];
         txReadPos++;
         
-        if (txReadPos > TX_BUFFER_SIZE)
+        if (txReadPos > 15)
         {
             txReadPos = 0;
         }
