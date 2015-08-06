@@ -22,6 +22,7 @@
 #define FREQ_JOYSTICK 1000 
 #define FREQ_SERIAL_READ 1000
 #define FREQ_SERIAL_WRITE 50
+#define FREQ_TERMINAL_WRITE 60
 
 // Constants for computing the battery voltage from the received ADC value
 #define VCC 4.993
@@ -30,6 +31,7 @@
 void *joystickUpdater(void *argument);
 void *serialReader(void *argument);
 void *serialWriter(void *argument);
+void *terminalWriter(void *argument);
 uint8_t mapToRange(int number);
 
 uint8_t roll;
@@ -42,6 +44,8 @@ uint8_t button3;
 uint8_t button4;
 uint8_t button5;
 uint8_t button6;
+
+double voltage
 
 struct joystick joystick;
 struct serialPort serialPort;
@@ -57,13 +61,14 @@ int main(void)
 	// Launch threads
 	pthread_attr_t attr;
 	pthread_attr_init(&attr);
-	pthread_t tids[3];
+	pthread_t tids[4];
 
 	pthread_create(&tids[0], &attr, joystickUpdater, NULL);
 	pthread_create(&tids[1], &attr, serialReader, NULL);
 	pthread_create(&tids[2], &attr, serialWriter, NULL);
+	pthread_create(&tids[3], &attr, terminalWriter, NULL);
 
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		pthread_join(tids[i], NULL);
 	}
@@ -105,11 +110,12 @@ void* serialReader(__attribute__ ((unused)) void *argument)
         readBytes(&serialPort);
 		usleep(1000000 / FREQ_SERIAL_READ);
         
-        uint16_t ans = (serialPort.bufferRX[3] << 8) | serialPort.bufferRX[4];
+        uint16_t temp = (serialPort.bufferRX[3] << 8) | serialPort.bufferRX[4];
+        voltage = temp / 1023.0 * VCC * DIVISOR;
 
-        printf("TEST: %d\n", ans);
+        //printf("TEST: %d\n", temp);
 
-        printf("Battery voltage: %.2f\n", ans / 1023.0 * VCC * DIVISOR);
+        //printf("Battery voltage: %.2f\n", temp / 1023.0 * VCC * DIVISOR);
 	}
 
 	pthread_exit(0);
@@ -135,14 +141,6 @@ void* serialWriter(__attribute__ ((unused)) void *argument)
 		serialPort.bufferTX[13] = 1;
 		serialPort.bufferTX[14] = 'e';
 
-		printf("Throttle: %d, ", throttle);
-		printf("Roll: %d, ", roll);
-		printf("Pitch: %d, ", pitch);
-		printf("Yaw: %d, ", yaw);
-		printf("Toggle: %d.", button1);
-		printf("\r");
-		fflush(stdout);
-
 		sendBytes(&serialPort);
 
 		usleep(1000000 / FREQ_SERIAL_WRITE);
@@ -151,9 +149,28 @@ void* serialWriter(__attribute__ ((unused)) void *argument)
 	pthread_exit(0);
 }
 
+void* terminalWriter(__attribute__ ((unused)) void *argument)
+{
+    while (1)
+    {
+        printf("Throttle: %3d, ", throttle);
+        printf("Roll: %3d, ", roll);
+        printf("Pitch: %3d, ", pitch);
+        printf("Yaw: %3d, ", yaw);
+        printf("Switch: %3d.", button1);
+        printf("Voltage: %2.2f.", voltage);
+        printf("\r");
+        
+        fflush(stdout);
+        
+        usleep(1000000 / FREQ_TERMINAL_WRITE);
+    }
+
+    pthread_exit(0);
+}
+
 // Maps the reported joystick position to a number from 0 to 100
 uint8_t mapToRange(int number)
 {
 	return (uint8_t) ((number + 32767) / 655.34);
 }
-
