@@ -53,100 +53,96 @@ struct serialPort serialPort;
 int main(void)
 {
     joystick = initializeJoystick();
-	serialPort = openSerial();
+    serialPort = openSerial();
     
     printf("Joystick's file descriptor: %d\n\r", joystick.fd);
-	printf("Serial port's file descriptor: %d\n\r", serialPort.fd);
-	
-	// Launch threads
-	pthread_attr_t attr;
-	pthread_attr_init(&attr);
-	pthread_t tids[4];
-
-	pthread_create(&tids[0], &attr, joystickUpdater, NULL);
-	pthread_create(&tids[1], &attr, serialReader, NULL);
-	pthread_create(&tids[2], &attr, serialWriter, NULL);
-	pthread_create(&tids[3], &attr, terminalWriter, NULL);
-
-	for (int i = 0; i < 4; i++)
-	{
-		pthread_join(tids[i], NULL);
-	}
-
+    printf("Serial port's file descriptor: %d\n\r", serialPort.fd);
+    
+    // Launch threads
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_t tids[4];
+    
+    pthread_create(&tids[0], &attr, joystickUpdater, NULL);
+    pthread_create(&tids[1], &attr, serialReader, NULL);
+    pthread_create(&tids[2], &attr, serialWriter, NULL);
+    pthread_create(&tids[3], &attr, terminalWriter, NULL);
+    
+    for (int i = 0; i < 4; i++)
+    {
+        pthread_join(tids[i], NULL);
+    }
+    
     // Never reached because the threads run forever
-	terminateJoystick(&joystick);
-	closeSerial(&serialPort);
-
+    terminateJoystick(&joystick);
+    closeSerial(&serialPort);
+    
     return 0;
 }
 
 void *joystickUpdater(__attribute__ ((unused)) void *argument)
 {
-	while (1)
-	{
-		updateJoystick(&joystick);
-		
-		roll = mapToRange(-1 * joystick.axis[0]);
-		pitch = mapToRange(-1 * joystick.axis[1]);
-		yaw = mapToRange(joystick.axis[2]);
-		throttle = mapToRange(-1 * joystick.axis[3]);
-		button1 = joystick.button[0];
-		button2 = joystick.button[1];
-		button3 = joystick.button[2];
-		button4 = joystick.button[3];
-		button5 = joystick.button[4];
-		button6 = joystick.button[5];
-
-		usleep(1000000 / FREQ_JOYSTICK);
-	}
-
-	pthread_exit(0);
+    while (1)
+    {
+        updateJoystick(&joystick);
+        
+        roll = mapToRange(-1 * joystick.axis[0]);
+        pitch = mapToRange(-1 * joystick.axis[1]);
+	    yaw = mapToRange(joystick.axis[2]);
+        throttle = mapToRange(-1 * joystick.axis[3]);
+        button1 = joystick.button[0];
+        button2 = joystick.button[1];
+        button3 = joystick.button[2];
+        button4 = joystick.button[3];
+        button5 = joystick.button[4];
+        button6 = joystick.button[5];
+        
+        usleep(1000000 / FREQ_JOYSTICK);
+    }
+    
+    pthread_exit(0);
 }
 
 void* serialReader(__attribute__ ((unused)) void *argument)
 {
-	while (1)
-	{
+    while (1)
+    {
         readBytes(&serialPort);
-		usleep(1000000 / FREQ_SERIAL_READ);
+        usleep(1000000 / FREQ_SERIAL_READ);
         
         uint16_t temp = (serialPort.bufferRX[3] << 8) | serialPort.bufferRX[4];
         voltage = temp / 1023.0 * VCC * DIVISOR;
-
-        //printf("TEST: %d\n", temp);
-
-        //printf("Battery voltage: %.2f\n", temp / 1023.0 * VCC * DIVISOR);
-	}
-
-	pthread_exit(0);
+    }
+    
+    pthread_exit(0);
 }
 
 void* serialWriter(__attribute__ ((unused)) void *argument)
 {
-	while (1)
-	{
-		serialPort.bufferTX[0] = roll;
-		serialPort.bufferTX[1] = pitch;
-		serialPort.bufferTX[2] = yaw;
-		serialPort.bufferTX[3] = throttle;
-		serialPort.bufferTX[4] = button1;
-		serialPort.bufferTX[5] = button2;
-		serialPort.bufferTX[6] = button3;
-		serialPort.bufferTX[7] = button4;
-		serialPort.bufferTX[8] = button5;
-		serialPort.bufferTX[9] = button6;
-		serialPort.bufferTX[10] = 1;
-		serialPort.bufferTX[11] = 1;
-		serialPort.bufferTX[12] = 1;
-		serialPort.bufferTX[13] = 1;
-		serialPort.bufferTX[14] = 'e';
-
-		sendBytes(&serialPort);
-
-		usleep(1000000 / FREQ_SERIAL_WRITE);
-	}
-	
-	pthread_exit(0);
+    while (1)
+    {
+        serialPort.bufferTX[0] = roll;
+        serialPort.bufferTX[1] = pitch;
+        serialPort.bufferTX[2] = yaw;
+        serialPort.bufferTX[3] = throttle;
+        serialPort.bufferTX[4] = button1;
+        serialPort.bufferTX[5] = button2;
+        serialPort.bufferTX[6] = button3;
+        serialPort.bufferTX[7] = button4;
+        serialPort.bufferTX[8] = button5;
+        serialPort.bufferTX[9] = button6;
+        serialPort.bufferTX[10] = 1;
+        serialPort.bufferTX[11] = 1;
+        serialPort.bufferTX[12] = 1;
+        serialPort.bufferTX[13] = 1;
+        serialPort.bufferTX[14] = 'e';
+        
+        sendBytes(&serialPort);
+        
+        usleep(1000000 / FREQ_SERIAL_WRITE);
+    }
+    
+    pthread_exit(0);
 }
 
 void* terminalWriter(__attribute__ ((unused)) void *argument)
@@ -165,12 +161,12 @@ void* terminalWriter(__attribute__ ((unused)) void *argument)
         
         usleep(1000000 / FREQ_TERMINAL_WRITE);
     }
-
+    
     pthread_exit(0);
 }
 
 // Maps the reported joystick position to a number from 0 to 100
 uint8_t mapToRange(int number)
 {
-	return (uint8_t) ((number + 32767) / 655.34);
+    return (uint8_t) ((number + 32767) / 655.34);
 }
