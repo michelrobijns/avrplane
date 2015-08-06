@@ -1,8 +1,12 @@
 /*
  * main.c
  *
- * Created: 07/22/2015
+ * Created: 7/22/2015
  * Author: Michel Robijns
+ *
+ * This file is part of avrplane which is released under the MIT license.
+ * See the file LICENSE or go to http://opensource.org/licenses/MIT for full
+ * license details.
  */
 
 #include <stdio.h>
@@ -14,9 +18,12 @@
 #include "joystick.h"
 #include "serial.h"
 
+// Update frequencies
 #define FREQ_JOYSTICK 1000 
 #define FREQ_SERIAL_READ 1000
 #define FREQ_SERIAL_WRITE 50
+
+// Constants for computing the battery voltage from the received ADC value
 #define VCC 4.993
 #define DIVISOR 2.938
 
@@ -61,6 +68,7 @@ int main(void)
 		pthread_join(tids[i], NULL);
 	}
 
+    // Never reached because the threads run forever
 	terminateJoystick(&joystick);
 	closeSerial(&serialPort);
 
@@ -143,6 +151,7 @@ void* serialWriter(__attribute__ ((unused)) void *argument)
 	pthread_exit(0);
 }
 
+// Maps the reported joystick position to a number from 0 to 100
 uint8_t mapToRange(int number)
 {
 	return (uint8_t) ((number + 32767) / 655.34);

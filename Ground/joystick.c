@@ -1,8 +1,12 @@
 /*
  * joystick.c
  *
- * Created: 07/22/2015
+ * Created: 7/22/2015
  * Author: Michel Robijns
+ *
+ * This file is part of avrplane which is released under the MIT license.
+ * See the file LICENSE or go to http://opensource.org/licenses/MIT for full
+ * license details.
  */
 
 #include <stdio.h>
