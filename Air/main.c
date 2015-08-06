@@ -15,13 +15,23 @@
 #include "serial.h"
 #include "adc.h"
 
+// Change these values to adjust the neutral position of the control surfaces
 #define L_AILR_ADJ -5
 #define R_AILR_ADJ -3
 #define ELEVTR_ADJ -6
 #define RUDDER_ADJ -2
 #define NS_WHL_ADJ -27
 
-uint8_t allowThrust = 0;
+// External global variables
+extern uint16_t pwm[10];
+extern char rxBuffer[15];
+extern char txBuffer[15];
+extern uint16_t voltage;
+
+// External function declarations
+extern void doAt500Hz(void);
+
+uint8_t allowThrottle = 0;
 uint8_t flapsUp = 0;
 uint8_t flapsDown = 0;
 uint16_t counter1 = 0;
@@ -52,13 +62,23 @@ int main(void)
 // Process input from the joystick axes
 void updateAxes(void)
 {
+    // Left aileron
     pwm[0] = 1000 + 10 * ((int) rxBuffer[0] + L_AILR_ADJ + aileronOffset);
+    
+    // Right aileron
     pwm[1] = 1000 + 10 * ((int) rxBuffer[0] + R_AILR_ADJ - aileronOffset);
+    
+    // Elevator
     pwm[2] = 1000 + 10 * ((int) rxBuffer[1] + ELEVTR_ADJ - elevatorOffset / 10);
+    
+    // Rudder
     pwm[3] = 1000 + 10 * ((int) rxBuffer[2] + RUDDER_ADJ);
+    
+    // Nose wheel
     pwm[4] = 1300 + 4 * (100 - (int) rxBuffer[2] + NS_WHL_ADJ);
     
-    if (allowThrust)
+    // Throttle
+    if (allowThrottle)
     {
         pwm[5] = 1050 + 9 * (int) rxBuffer[3];
     }
@@ -68,17 +88,17 @@ void updateAxes(void)
 void updateButtons(void)
 {
     // Set the hat switch as a dead man's switch for the throttle
-    if (rxBuffer[4] == 1 && rxBuffer[3] == 0 && allowThrust == 0)
+    if (rxBuffer[4] == 1 && rxBuffer[3] == 0 && allowThrottle == 0)
     {
-        allowThrust = 1;
+        allowThrottle = 1;
     }
-    else if (rxBuffer[4] == 1 && allowThrust == 1)
+    else if (rxBuffer[4] == 1 && allowThrottle == 1)
     {
-        allowThrust = 1;
+        allowThrottle = 1;
     }
     else
     {
-        allowThrust = 0;
+        allowThrottle = 0;
         pwm[5] = 1000;
     }
     
