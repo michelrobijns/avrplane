@@ -153,8 +153,8 @@ void* terminalWriter(__attribute__ ((unused)) void *argument)
         printf("Roll: %3d, ", roll);
         printf("Pitch: %3d, ", pitch);
         printf("Yaw: %3d, ", yaw);
-        printf("Switch: %1d, ", button1);
-        printf("Voltage: %2.2f.", voltage);
+        printf("Engine armed: %1d, ", button1);
+        printf("Battery voltage: %2.2f V (charge below 11 V).", voltage);
         printf("\r");
         
         fflush(stdout);
@@ -170,3 +170,4 @@ uint8_t mapToRange(int number)
 {
     return (uint8_t) ((number + 32767) / 655.34);
 }
+
