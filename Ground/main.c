@@ -45,7 +45,7 @@ uint8_t button4;
 uint8_t button5;
 uint8_t button6;
 
-double voltage
+double voltage = 0;
 
 struct joystick joystick;
 struct serialPort serialPort;
@@ -157,7 +157,7 @@ void* terminalWriter(__attribute__ ((unused)) void *argument)
         printf("Roll: %3d, ", roll);
         printf("Pitch: %3d, ", pitch);
         printf("Yaw: %3d, ", yaw);
-        printf("Switch: %3d.", button1);
+        printf("Switch: %1d, ", button1);
         printf("Voltage: %2.2f.", voltage);
         printf("\r");
         
