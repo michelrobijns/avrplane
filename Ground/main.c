@@ -34,16 +34,16 @@ void *serialWriter(void *argument);
 void *terminalWriter(void *argument);
 uint8_t mapToRange(int number);
 
-uint8_t roll;
-uint8_t pitch;
-uint8_t yaw;
-uint8_t throttle;
-uint8_t button1;
-uint8_t button2;
-uint8_t button3;
-uint8_t button4;
-uint8_t button5;
-uint8_t button6;
+uint8_t roll = 50;
+uint8_t pitch = 50;
+uint8_t yaw = 50;
+uint8_t throttle = 0;
+uint8_t button1 = 0;
+uint8_t button2 = 0;
+uint8_t button3 = 0;
+uint8_t button4 = 0;
+uint8_t button5 = 0;
+uint8_t button6 = 0;
 
 double voltage = 0;
 

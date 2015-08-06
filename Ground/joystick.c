@@ -24,9 +24,12 @@ struct joystick initializeJoystick(void)
 {
 	struct joystick joystick = {1, 0, 0, "", NULL, NULL};
     
-    if ((joystick.fd = open(JS, O_RDONLY)) == -1)
+    while ((joystick.fd = open(JS, O_RDONLY)) == -1)
     {
-        printf("Could not open joystick\n\r");
+        printf("Could not open joystick. Make sure that a joystick is connected.\r");
+        fflush(stdout);
+
+        usleep(1000000);
     }
     
     ioctl(joystick.fd, JSIOCGAXES, &joystick.numberOfAxis);
