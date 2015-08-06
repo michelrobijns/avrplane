@@ -3,6 +3,10 @@
  *
  * Created: 8/4/2015
  * Author: Michel Robijns
+ * 
+ * This file is part of avrplane which is released under the MIT license.
+ * See the file LICENSE or go to http://opensource.org/licenses/MIT for full
+ * license details.
  */
 
 #include <avr/io.h>
@@ -12,10 +16,16 @@
 #include "timers.h"
 
 uint8_t channel = 0;
+
+// Declare the signal pin of each servo
 uint8_t pwmPins[10] = {0b00100000, 0b00010000, 0b00001000, 0b00000100, 
                        0b00000010, 0b00000001, 0, 0, 0, 0};
+
+// Declare the initial pulse width in microseconds of each servo
 uint16_t pwm[10] = {1450, 1450, 1500, 1500, 1340, 
                     1000, 1500, 1500, 1500, 1500};
+
+// Declare the bank of each signal pin
 volatile uint8_t *pwmBanks[10] = {&PORTB, &PORTB, &PORTB, &PORTB, &PORTB, 
                                   &PORTB, &PORTB, &PORTB, &PORTB, &PORTB};
 

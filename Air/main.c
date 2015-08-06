@@ -3,6 +3,10 @@
  *
  * Created: 7/23/2015
  * Author: Michel Robijns
+ * 
+ * This file is part of avrplane which is released under the MIT license.
+ * See the file LICENSE or go to http://opensource.org/licenses/MIT for full
+ * license details.
  */
 
 #define F_CPU 16000000L
@@ -22,13 +26,13 @@
 #define RUDDER_ADJ -2
 #define NS_WHL_ADJ -27
 
-// External global variables
+// Declare external global variables
 extern uint16_t pwm[10];
 extern char rxBuffer[15];
 extern char txBuffer[15];
 extern uint16_t voltage;
 
-// External function declarations
+// Declare external functions
 extern void doAt500Hz(void);
 
 uint8_t allowThrottle = 0;
@@ -44,6 +48,7 @@ void updateButtons(void);
 
 int main(void)
 {
+    // Call setup functions
     setupSerial();
     setupTimers();
     setupADC();
@@ -57,6 +62,33 @@ int main(void)
     }
     
     return 0;
+}
+
+// This function is called 500 times per second
+void doAt500Hz(void)
+{
+    updateAxes();
+    updateButtons();
+
+    counter1++;
+    counter2++;
+
+    if (counter1 == 10) // Triggered exactly 50 times per second
+    {
+        updateADCs();
+        counter1 = 0;
+    }
+
+    if (counter2 == 500) // Triggered exactly 1 time per second
+    {
+        txBuffer[3] = voltage >> 8;
+        txBuffer[4] = voltage & 0xFF;
+
+        // Sends whatever is in the TX buffer
+        sendTxBuffer();
+
+        counter2 = 0;
+    }
 }
 
 // Process input from the joystick axes
@@ -78,7 +110,7 @@ void updateAxes(void)
     pwm[4] = 1300 + 4 * (100 - (int) rxBuffer[2] + NS_WHL_ADJ);
     
     // Throttle
-    if (allowThrottle)
+    if (allowThrottle) // Dead man's switch
     {
         pwm[5] = 1050 + 9 * (int) rxBuffer[3];
     }
@@ -87,7 +119,7 @@ void updateAxes(void)
 // Process input from the joystick buttons
 void updateButtons(void)
 {
-    // Set the hat switch as a dead man's switch for the throttle
+    // Set the joystick hat switch as a dead man's switch for the throttle
     if (rxBuffer[4] == 1 && rxBuffer[3] == 0 && allowThrottle == 0)
     {
         allowThrottle = 1;
@@ -112,6 +144,9 @@ void updateButtons(void)
         aileronOffset -= (aileronOffset > 0) ? 13 : 0;
     }
     
+    // The following two variables record the state of buttons 5 and 6. Doing
+    // so, it is possible to detect a CHANGE in the state of these buttons,
+    // rather than simply detecting whether the buttons are being pressed.
     flapsDown = rxBuffer[8];
     flapsUp = rxBuffer[9];
     
@@ -129,32 +164,5 @@ void updateButtons(void)
     if (rxBuffer[5] == 1)
     {
         elevatorOffset = 0;
-    }
-}
-
-// This function is called 500 times per second
-void doAt500Hz(void)
-{
-    updateAxes();
-    updateButtons();
-    
-    counter1++;
-    counter2++;
-    
-    if (counter1 == 10) // Triggered exactly 50 times per second
-    {
-        updateADCs();
-        counter1 = 0;
-    }
-    
-    if (counter2 == 500) // Triggered exactly 1 time per second
-    {
-        txBuffer[3] = voltage >> 8;
-        txBuffer[4] = voltage & 0xFF;
-        
-        // Sends whatever is in the TX buffer
-        sendTxBuffer();
-        
-        counter2 = 0;
     }
 }
