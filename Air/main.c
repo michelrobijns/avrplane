@@ -15,10 +15,11 @@
 #include "serial.h"
 #include "adc.h"
 
-#define AILRN_ADJ -5
-#define ELVTR_ADJ 0
-#define RUDDR_ADJ 0
-#define N_WHL_ADJ -27
+#define L_AILR_ADJ -5
+#define R_AILR_ADJ -3
+#define ELEVTR_ADJ -6
+#define RUDDER_ADJ -2
+#define NS_WHL_ADJ -27
 
 uint8_t allowThrust = 0;
 uint8_t flapsUp = 0;
@@ -51,11 +52,11 @@ int main(void)
 // Process input from the joystick axes
 void updateAxes(void)
 {
-    pwm[0] = 1000 + 10 * ((int) rxBuffer[0] + AILRN_ADJ + aileronOffset);
-    pwm[1] = 1000 + 10 * ((int) rxBuffer[0] + AILRN_ADJ - aileronOffset);
-    pwm[2] = 1000 + 10 * ((int) rxBuffer[1] + ELVTR_ADJ - elevatorOffset / 10);
-    pwm[3] = 1000 + 10 * ((int) rxBuffer[2] + RUDDR_ADJ);
-    pwm[4] = 1300 + 4 * (100 - (int) rxBuffer[2] + N_WHL_ADJ);
+    pwm[0] = 1000 + 10 * ((int) rxBuffer[0] + L_AILR_ADJ + aileronOffset);
+    pwm[1] = 1000 + 10 * ((int) rxBuffer[0] + R_AILR_ADJ - aileronOffset);
+    pwm[2] = 1000 + 10 * ((int) rxBuffer[1] + ELEVTR_ADJ - elevatorOffset / 10);
+    pwm[3] = 1000 + 10 * ((int) rxBuffer[2] + RUDDER_ADJ);
+    pwm[4] = 1300 + 4 * (100 - (int) rxBuffer[2] + NS_WHL_ADJ);
     
     if (allowThrust)
     {
